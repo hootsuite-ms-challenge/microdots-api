@@ -1,7 +1,5 @@
 from rest_framework import serializers
 
-from django.conf import settings
-
 from .models import Edge, Vertex
 
 
@@ -32,3 +30,14 @@ class VertexSerializer(serializers.Serializer):
 class PortalSerializer(serializers.Serializer):
     nodes = serializers.ListField(child=VertexSerializer())
     edges = serializers.ListField(child=EdgeSerializer())
+
+
+class MicrodotSerializer(serializers.Serializer):
+    origin = serializers.CharField()
+    target = serializers.CharField()
+    method = serializers.CharField()
+    endpoint = serializers.CharField()
+
+    def save(self):
+        origin = Vertex(self.validated_data['origin'])
+        target = Vertex(self.validated_data['target'])

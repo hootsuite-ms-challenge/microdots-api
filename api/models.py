@@ -10,27 +10,30 @@ class BaseGraph(object):
 class Vertex(BaseGraph):
     LABEL = 'Microdot'
 
-    def __init__(self, name=None):
+    def __init__(self, name=None, endpoint=None):
         self.endpoints = None
         self.uuid = None
         self.name = name
-        self.node = self.get_or_create(name)
+        self.node = self.instantiate_node(name)
+        if endpoint:
+            self.endpoints.add(endpoint)
 
-    def get_or_create(self, name):
+    def instantiate_node(self, name):
         node = self.graph.find_one(self.LABEL, property_key='name', property_value=name)
         if not node:
             node = Node(self.LABEL, name=name)
         self.uuid = node.__name__
 
-        try:
-            self.endpoints = node['endpoints']
-        except ValueError:
+        self.endpoints = node['endpoints']
+        if self.endpoints:
+            self.endpoints = set(self.endpoints)
+        else:
             self.endpoints = set()
 
         return node
 
     def save(self):
-        self.node['endpoints'] = self.endpoints
+        self.node['endpoints'] = list(self.endpoints)
         if self.graph.exists(self.node):
             self.graph.push(self.node)
         else:
