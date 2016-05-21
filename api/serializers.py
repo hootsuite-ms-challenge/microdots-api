@@ -39,5 +39,8 @@ class MicrodotSerializer(serializers.Serializer):
     endpoint = serializers.CharField()
 
     def save(self):
+        endpoint = '{method} {uri}'.format(method=self.validated_data['method'],
+                                           uri=self.validated_data['endpoint'])
         origin = Vertex(self.validated_data['origin'])
-        target = Vertex(self.validated_data['target'])
+        target = Vertex(self.validated_data['target'], endpoint)
+        Edge(origin, target, endpoint)

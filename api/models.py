@@ -43,18 +43,23 @@ class Vertex(BaseGraph):
 class Edge(BaseGraph):
     TYPE = 'Depends'
 
-    def __init__(self, origin, target):
+    def __init__(self, origin, target, endpoint):
         self.origin = origin
         self.target = target
-        self.relationship = Relationship(origin, self.TYPE, target)
+        self.relationship = Relationship(origin.node, self.TYPE, target.node)
+        self.add_endpoint(endpoint)
 
     @property
     def node_from(self):
-        return self.origin.__name__
+        return self.origin.node.__name__
 
     @property
     def node_to(self):
-        return self.target.__name__
+        return self.target.node.__name__
+
+    def add_endpoint(self, endpoint):
+        # TODO adds on Redis the endpoint
+        pass
 
     def save(self):
         self.graph.create(self.relationship)

@@ -58,7 +58,7 @@ class EdgeTestCase(GraphTestCase):
         self.target.save()
 
     def test_create_edge(self):
-        edge = Edge(self.origin.node, self.target.node)
+        edge = Edge(self.origin, self.target, 'GET /test/')
         self.assertIsInstance(edge, Edge)
 
 
