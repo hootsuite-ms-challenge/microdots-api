@@ -61,6 +61,26 @@ class EdgeTestCase(GraphTestCase):
         edge = Edge(self.origin, self.target, 'GET /test/')
         self.assertIsInstance(edge, Edge)
 
+    def test_format_endpoint(self):
+        endpoint = 'GET /test/3'
+        edge = Edge(self.origin, self.target, endpoint)
+        self.assertEqual('GET /test/{id}', edge.format_endpoint(endpoint))
+
+    def test_format_endpoint_ending_in_slash(self):
+        endpoint = 'GET /test/3/'
+        edge = Edge(self.origin, self.target, endpoint)
+        self.assertEqual('GET /test/{id}/', edge.format_endpoint(endpoint))
+
+    def test_format_endpoint_with_action(self):
+        endpoint = 'GET /test/3/action'
+        edge = Edge(self.origin, self.target, endpoint)
+        self.assertEqual('GET /test/{id}/action', edge.format_endpoint(endpoint))
+
+    def test_format_endpoint_with_querystring(self):
+        endpoint = 'GET /test/3?name=user'
+        edge = Edge(self.origin, self.target, endpoint)
+        self.assertEqual('GET /test/{id}', edge.format_endpoint(endpoint))
+
 
 class ApiTestCase(GraphTestCase):
     def setUp(self):

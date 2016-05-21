@@ -1,3 +1,5 @@
+import re
+
 from py2neo import Node, Relationship
 
 from django.conf import settings
@@ -48,6 +50,10 @@ class Edge(BaseGraph):
         self.target = target
         self.relationship = Relationship(origin.node, self.TYPE, target.node)
         self.add_endpoint(endpoint)
+
+    def format_endpoint(self, endpoint):
+        endpoint = re.sub(r'/\d', '/{id}', endpoint)
+        return re.sub(r'\?.*', '', endpoint)
 
     @property
     def node_from(self):
