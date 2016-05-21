@@ -1,0 +1,4 @@
+Django>1.8,<1.9
+djangorestframework==3.3.3
+py2neo==3
+redis==2.10.5
