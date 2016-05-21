@@ -1,6 +1,7 @@
 from unittest import TestCase
 
 from django.conf import settings
+from rest_framework.test import APIClient
 from .models import Edge, Vertex
 
 
@@ -48,14 +49,30 @@ class VertexTestCase(GraphTestCase):
 
 
 class EdgeTestCase(GraphTestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.origin = Vertex('origin')
+        self.origin.save()
+        self.target = Vertex('target', '/usr/test2')
+        self.target.save()
+
     def test_create_edge(self):
-        origin = Vertex('origin')
-        origin.save()
-        target = Vertex('target', '/usr/test2')
-        target.save()
-        edge = Edge(origin.node, target.node)
+        edge = Edge(self.origin.node, self.target.node)
         self.assertIsInstance(edge, Edge)
 
 
-class ApiTestCase(TestCase):
-    pass
+class ApiTestCase(GraphTestCase):
+    def setUp(self):
+        super().setUp()
+        self.client = APIClient()
+        self.data = {
+            'origin': 'origin-requester',
+            'target': 'target-requester',
+            'method': 'get',
+            'endpoint': '/api/test/'
+        }
+
+    def test_post_microdot_response(self):
+        request = self.client.post('/microdot/', self.data)
+        self.assertEqual(201, request.status_code)
