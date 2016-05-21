@@ -48,15 +48,16 @@ class VertexTestCase(GraphTestCase):
             Vertex()
 
 
-class EdgeTestCase(GraphTestCase):
+class BaseEdgeTestCase(GraphTestCase):
     def setUp(self):
         super().setUp()
-
         self.origin = Vertex('origin')
         self.origin.save()
         self.target = Vertex('target', '/usr/test2')
         self.target.save()
 
+
+class EdgeTestCase(BaseEdgeTestCase):
     def test_create_edge(self):
         edge = Edge(self.origin, self.target, 'GET /test/')
         self.assertIsInstance(edge, Edge)
@@ -101,3 +102,23 @@ class ApiTestCase(GraphTestCase):
     def test_post_microdot_response(self):
         request = self.client.post('/microdot/', self.data)
         self.assertEqual(201, request.status_code)
+
+class RedisBackendTestCase(BaseEdgeTestCase):
+    def setUp(self):
+        super().setUp()
+        self.backend = settings.PERSISTENT_BACKEND
+
+    def tearDown(self):
+        self.backend.flush_db()
+
+    def test_load_endpoints(self):
+        test_endpoint = 'GET /test/'
+        self.edge = Edge(self.origin, self.target, test_endpoint)
+        endpoints = self.edge.load_endpoints()
+        self.assertIn(test_endpoint, endpoints)
+
+    def test_load_multiple_endpoints(self):
+        Edge(self.origin, self.target, 'GET /test/')
+        self.edge = Edge(self.origin, self.target, 'GET /test/2')
+        endpoints = self.edge.load_endpoints()
+        self.assertEqual(len(endpoints), 2)

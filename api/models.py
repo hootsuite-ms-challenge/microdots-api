@@ -6,6 +6,7 @@ from django.conf import settings
 
 
 class BaseGraph(object):
+    backend = settings.PERSISTENT_BACKEND
     graph = settings.GRAPH
 
 
@@ -49,7 +50,7 @@ class Edge(BaseGraph):
         self.origin = origin
         self.target = target
         self.relationship = self.instantiate_relationship(origin, target)
-        self.add_endpoint(endpoint)
+        self.save_endpoint(endpoint)
 
     def instantiate_relationship(self, origin, target):
         relationship = self.graph.match(start_node=origin, rel_type=self.TYPE, end_node=target.node)
@@ -57,6 +58,13 @@ class Edge(BaseGraph):
             relationship = Relationship(origin.node, self.TYPE, target.node)
         self.uuid = relationship.__name__
         return relationship
+
+    def load_endpoints(self):
+        return self.backend.load_endpoints(self.name)
+
+    @property
+    def name(self):
+        return self.relationship.__name__
 
     def format_endpoint(self, endpoint):
         endpoint = re.sub(r'/\d', '/{id}', endpoint)
@@ -70,9 +78,9 @@ class Edge(BaseGraph):
     def node_to(self):
         return self.target.node.__name__
 
-    def add_endpoint(self, endpoint):
-        # TODO adds on Redis the endpoint
-        pass
+    def save_endpoint(self, endpoint):
+        endpoint = self.format_endpoint(endpoint)
+        self.backend.save_endpoint(self.name, endpoint)
 
     def save(self):
         self.graph.create(self.relationship)
