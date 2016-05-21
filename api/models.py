@@ -1,3 +1,4 @@
+from collections import Counter
 import re
 
 from py2neo import Node, Relationship
@@ -60,7 +61,8 @@ class Edge(BaseGraph):
         return relationship
 
     def load_endpoints(self):
-        return self.backend.load_endpoints(self.name)
+        endpoints = self.backend.load_endpoints(self.name)
+        return Counter(endpoints)
 
     @property
     def name(self):
