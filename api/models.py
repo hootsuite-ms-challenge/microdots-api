@@ -48,8 +48,15 @@ class Edge(BaseGraph):
     def __init__(self, origin, target, endpoint):
         self.origin = origin
         self.target = target
-        self.relationship = Relationship(origin.node, self.TYPE, target.node)
+        self.relationship = self.instantiate_relationship(origin, target)
         self.add_endpoint(endpoint)
+
+    def instantiate_relationship(self, origin, target):
+        relationship = self.graph.match(start_node=origin, rel_type=self.TYPE, end_node=target.node)
+        if not relationship:
+            relationship = Relationship(origin.node, self.TYPE, target.node)
+        self.uuid = relationship.__name__
+        return relationship
 
     def format_endpoint(self, endpoint):
         endpoint = re.sub(r'/\d', '/{id}', endpoint)

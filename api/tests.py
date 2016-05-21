@@ -61,6 +61,11 @@ class EdgeTestCase(GraphTestCase):
         edge = Edge(self.origin, self.target, 'GET /test/')
         self.assertIsInstance(edge, Edge)
 
+    def test_create_edge_twice(self):
+        edge = Edge(self.origin, self.target, 'GET /test/')
+        edge2 = Edge(self.origin, self.target, 'GET /test/')
+        self.assertEqual(edge.name, edge2.name)
+
     def test_format_endpoint(self):
         endpoint = 'GET /test/3'
         edge = Edge(self.origin, self.target, endpoint)
