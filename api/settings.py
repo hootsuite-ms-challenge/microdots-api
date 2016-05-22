@@ -107,3 +107,4 @@ STATIC_URL = '/static/'
 
 GRAPH = Graph(password=os.environ.get('NEO4J_PASSWORD', ''), bolt=False)
 PERSISTENT_BACKEND = RedisBackend()
+ENDPOINT_ENTRY_TIMEOUT = 120

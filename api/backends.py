@@ -1,5 +1,6 @@
 import random
 import string
+from django.conf import settings
 import redis
 
 
@@ -23,3 +24,4 @@ class RedisBackend(object):
         )
         id = '{name}#{suffix}'.format(name=name, suffix=random_suffix)
         self.redis_server.set(id, endpoint)
+        self.redis_server.expire(id, settings.ENDPOINT_ENTRY_TIMEOUT)
