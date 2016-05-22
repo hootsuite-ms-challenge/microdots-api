@@ -13,6 +13,7 @@ class EdgeSerializer(serializers.Serializer):
             'to': obj.node_to,
             'label': self.get_endpoint_usage(obj),
             'id': obj.name,
+            'endpoints': self.get_endpoints(obj),
         }
 
     def get_endpoint_usage(self, obj):
@@ -21,6 +22,10 @@ class EdgeSerializer(serializers.Serializer):
         intersection = total.intersection(partial)
         usage = len(intersection) * 100 / len(total)
         return '{:.1f}%'.format(usage)
+
+    def get_endpoints(self, obj):
+        endpoints = obj.load_endpoints()
+        return [{'endpoint': e, 'acessos': endpoints[e]} for e in endpoints]
 
 
 class VertexSerializer(serializers.Serializer):
