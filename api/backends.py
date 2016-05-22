@@ -6,7 +6,7 @@ import redis
 
 class RedisBackend(object):
     def __init__(self):
-        self.redis_server = redis.StrictRedis()
+        self.redis_server = redis.from_url(settings.REDIS_URL)
 
     def flush_db(self):
         self.redis_server.flushdb()

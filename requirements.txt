@@ -1,5 +1,6 @@
 Django>1.8,<1.9
 django-cors-headers==1.1.0
 djangorestframework==3.3.3
+gunicorn==19.5.0
 py2neo==3
 redis==2.10.5

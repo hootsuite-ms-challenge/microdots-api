@@ -105,10 +105,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT= 'staticfiles'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-GRAPH = Graph(password=os.environ.get('NEO4J_PASSWORD', ''), bolt=False)
+NEO4J_URL = os.environ.get('GRAPHENEDB_URL', 'http://localhost:7474/db/data/')
+GRAPH = Graph(NEO4J_URL, bolt=False)
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379')
 PERSISTENT_BACKEND = RedisBackend()
 ENDPOINT_ENTRY_TIMEOUT = 120
 
