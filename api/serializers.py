@@ -10,8 +10,16 @@ class EdgeSerializer(serializers.Serializer):
     def to_representation(self, obj):
         return {
             'from': obj.node_from,
-            'to': obj.node_to
+            'to': obj.node_to,
+            'label': self.get_endpoint_usage(obj),
+            'id': obj.name,
         }
+
+    def get_endpoint_usage(self, obj):
+        total = set(obj.target.node['endpoints'])
+        partial = set(obj.load_endpoints().keys())
+        intersection = total.intersection(partial)
+        return len(intersection) * 100 / len(total)
 
 
 class VertexSerializer(serializers.Serializer):
@@ -41,5 +49,7 @@ class MicrodotSerializer(serializers.Serializer):
         endpoint = '{method} {uri}'.format(method=self.validated_data['method'],
                                            uri=self.validated_data['endpoint'])
         origin = Vertex(self.validated_data['origin'])
+        origin.save()
         target = Vertex(self.validated_data['target'], endpoint)
-        Edge(origin, target, endpoint)
+        target.save()
+        Edge(origin, target, endpoint).save()

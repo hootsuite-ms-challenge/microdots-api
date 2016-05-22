@@ -1,3 +1,4 @@
+import json
 from unittest import TestCase
 
 from django.conf import settings
@@ -128,6 +129,42 @@ class ApiTestCase(GraphTestCase):
     def test_post_microdot_response(self):
         request = self.client.post('/microdot/', self.data)
         self.assertEqual(201, request.status_code)
+
+    def test_get_graph_json(self):
+        origin = Vertex('origin')
+        origin.save()
+        target = Vertex('target', 'GET /test/3/')
+        target.save()
+        edge = Edge(origin, target, 'GET /test/3/')
+        edge.save()
+        request = self.client.get('/graph/')
+        self.assertEqual(200, request.status_code)
+
+    def test_get_graph_json_partial_usage(self):
+        origin = Vertex('origin')
+        origin.save()
+        target = Vertex('target', 'GET /test/3/')
+        target.save()
+        Vertex('target', 'GET /foo/bar/').save()
+        edge = Edge(origin, target, 'GET /test/3/')
+        edge.save()
+        request = self.client.get('/graph/')
+        content = json.loads(request.content.decode('utf-8'))
+        self.assertEqual(50.0, content['edges'][0]['label'])
+
+    def test_get_graph_json_without_redis_endpoint(self):
+        origin = Vertex('origin')
+        origin.save()
+        target = Vertex('target', 'GET /test/3/')
+        target.save()
+        edge = Edge(origin, target, 'GET /test/3/')
+        edge.save()
+        backend = settings.PERSISTENT_BACKEND
+        backend.flush_db()
+
+        request = self.client.get('/graph/')
+        content = json.loads(request.content.decode('utf-8'))
+        self.assertFalse(content['edges'])
 
 
 class RedisBackendTestCase(BaseEdgeTestCase):
