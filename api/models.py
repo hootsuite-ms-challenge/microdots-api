@@ -81,9 +81,11 @@ class Edge(BaseGraph):
         self.relationship = self.instantiate_relationship(origin.node, target.node)
 
     def instantiate_relationship(self, origin_node, target_node):
-        relationship = self.graph.match_one(start_node=origin_node, rel_type=self.TYPE, end_node=target_node)
+        relationship = self.graph.match_one(start_node=origin_node,
+                                            rel_type=self.TYPE,
+                                            end_node=target_node)
         if relationship is None:
-            name = origin_node['name'] + '-' +  target_node['name']
+            name = origin_node['name'] + '-' + target_node['name']
             relationship = Relationship(origin_node, self.TYPE, target_node, name=name)
         return relationship
 

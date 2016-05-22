@@ -178,7 +178,7 @@ class ApiTestCase(GraphTestCase):
         edge.save()
         request = self.client.get('/graph/')
         content = json.loads(request.content.decode('utf-8'))
-        self.assertEqual('50.0%', content['edges'][0]['label'])
+        self.assertEqual('50.0%', content['edges'][0]['usage'])
 
     def test_get_graph_json_without_redis_endpoint(self):
         origin = Vertex('origin')
