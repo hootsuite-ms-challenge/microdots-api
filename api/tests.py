@@ -68,6 +68,18 @@ class VertexTestCase(GraphTestCase):
         target.save()
         self.assertEqual(0, target.dependents_number)
 
+    def test_get_vertex_maximum_size(self):
+        vertex = Vertex('name')
+        vertex.save()
+        vertex.dependents = range(16)
+        self.assertEqual(settings.NODE_SIZE[1], vertex.calc_vertex_size(4, 16))
+
+    def test_get_vertex_minimum_size(self):
+        vertex = Vertex('name')
+        vertex.save()
+        vertex.dependents = [1]
+        self.assertEqual(settings.NODE_SIZE[0], vertex.calc_vertex_size(1, 15))
+
 
 class BaseEdgeTestCase(GraphTestCase):
     def setUp(self):
@@ -166,7 +178,7 @@ class ApiTestCase(GraphTestCase):
         edge.save()
         request = self.client.get('/graph/')
         content = json.loads(request.content.decode('utf-8'))
-        self.assertEqual(50.0, content['edges'][0]['label'])
+        self.assertEqual('50.0%', content['edges'][0]['label'])
 
     def test_get_graph_json_without_redis_endpoint(self):
         origin = Vertex('origin')

@@ -19,7 +19,8 @@ class EdgeSerializer(serializers.Serializer):
         total = set(obj.target.node['endpoints'])
         partial = set(obj.load_endpoints().keys())
         intersection = total.intersection(partial)
-        return len(intersection) * 100 / len(total)
+        usage = len(intersection) * 100 / len(total)
+        return '{:.1f}%'.format(usage)
 
 
 class VertexSerializer(serializers.Serializer):
@@ -31,6 +32,7 @@ class VertexSerializer(serializers.Serializer):
             'id': obj.name,
             'label': obj.name,
             'endpoints': obj.endpoints,
+            'value': obj.vertex_size,
         }
 
 

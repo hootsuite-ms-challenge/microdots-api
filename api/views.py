@@ -28,14 +28,24 @@ class GraphView(APIView):
         for e in self.graph.match(rel_type=Edge.TYPE):
             edge = Edge(origin=Vertex(e.start_node()['name']),
                         target=Vertex(e.end_node()['name']))
-            if len(edge.load_endpoints().keys()):
+            if len(edge.load_endpoints()):
                 edges.append(edge)
+            else:
+                edge.delete()
         return edges
 
     def get_vertexes(self):
         vertexes = []
+        max_depends = 0
+        min_depends = 0
         for v in self.graph.find(label=Vertex.LABEL):
             vertex = Vertex(name=v['name'])
+            dependents = vertex.dependents_number
+            max_depends = max(max_depends, dependents)
+            min_depends = min(min_depends, dependents)
             vertexes.append(vertex)
+
+        for v in vertexes:
+            v.calc_vertex_size(min_depends, max_depends)
 
         return vertexes

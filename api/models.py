@@ -21,6 +21,9 @@ class Vertex(BaseGraph):
     def __init__(self, name, endpoint=None):
         self.endpoints = None
         self.name = name
+        self.dependents = None
+        self.max_know_depedents = 0
+        self.min_know_depedents = 0
         self.node = self.instantiate_node(name)
         if endpoint:
             self.endpoints.add(self.format_endpoint(endpoint))
@@ -41,11 +44,23 @@ class Vertex(BaseGraph):
 
     @property
     def dependents_number(self):
-        subgraph = [v for v in self.graph.match(
+        self.update_dependents()
+        if self.dependents:
+            return len(self.dependents)
+        return 0
+
+    def update_dependents(self):
+        self.dependents = [v for v in self.graph.match(
             rel_type=Edge.TYPE,
             end_node=self.node)
         ]
-        return len(subgraph)
+        return self.dependents
+
+    def calc_vertex_size(self, minimum, maximum):
+        min_settings, max_settings = settings.NODE_SIZE
+        factor = (max_settings - min_settings) * (len(self.dependents) - minimum)
+        self.vertex_size = (factor / max(1, (maximum - minimum))) + min_settings
+        return self.vertex_size
 
     def save(self):
         self.node['endpoints'] = list(self.endpoints)
@@ -61,9 +76,8 @@ class Edge(BaseGraph):
     def __init__(self, origin, target, endpoint=None):
         self.origin = origin
         self.target = target
+        self.endpoint = endpoint
         self.relationship = self.instantiate_relationship(origin.node, target.node)
-        if endpoint:
-            self.endpoint = endpoint
 
     def instantiate_relationship(self, origin_node, target_node):
         relationship = self.graph.match_one(start_node=origin_node, rel_type=self.TYPE, end_node=target_node)
@@ -100,3 +114,6 @@ class Edge(BaseGraph):
 
         if self.endpoint:
             self.save_endpoint(self.endpoint)
+
+    def delete(self):
+        self.graph.separate(self.relationship)

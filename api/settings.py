@@ -111,3 +111,5 @@ CORS_ORIGIN_ALLOW_ALL = True
 GRAPH = Graph(password=os.environ.get('NEO4J_PASSWORD', ''), bolt=False)
 PERSISTENT_BACKEND = RedisBackend()
 ENDPOINT_ENTRY_TIMEOUT = 120
+
+NODE_SIZE = (5, 50)
