@@ -19,7 +19,7 @@ class GraphView(APIView):
     graph = settings.GRAPH
 
     def get(self, request):
-        serializer = PortalSerializer({'nodes': self.get_vertexes(),
+        serializer = PortalSerializer({'nodes': self.get_vertices(),
                                        'edges': self.get_edges()})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -34,8 +34,8 @@ class GraphView(APIView):
                 edge.delete()
         return edges
 
-    def get_vertexes(self):
-        vertexes = []
+    def get_vertices(self):
+        vertices = []
         max_depends = 0
         min_depends = 0
         for v in self.graph.find(label=Vertex.LABEL):
@@ -43,9 +43,9 @@ class GraphView(APIView):
             dependents = vertex.dependents_number
             max_depends = max(max_depends, dependents)
             min_depends = min(min_depends, dependents)
-            vertexes.append(vertex)
+            vertices.append(vertex)
 
-        for v in vertexes:
-            v.calc_vertex_size(min_depends, max_depends, len(vertexes))
+        for v in vertices:
+            v.calc_vertex_size(min_depends, max_depends, len(vertices))
 
-        return vertexes
+        return vertices
