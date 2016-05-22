@@ -72,13 +72,13 @@ class VertexTestCase(GraphTestCase):
         vertex = Vertex('name')
         vertex.save()
         vertex.dependents = range(16)
-        self.assertEqual(settings.NODE_SIZE[1], vertex.calc_vertex_size(4, 16))
+        self.assertEqual(settings.NODE_SIZE[1], vertex.calc_vertex_size(4, 16, 400))
 
     def test_get_vertex_minimum_size(self):
         vertex = Vertex('name')
         vertex.save()
         vertex.dependents = [1]
-        self.assertEqual(settings.NODE_SIZE[0], vertex.calc_vertex_size(1, 15))
+        self.assertEqual(settings.NODE_SIZE[0], vertex.calc_vertex_size(1, 15, 400))
 
 
 class BaseEdgeTestCase(GraphTestCase):

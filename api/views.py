@@ -46,6 +46,6 @@ class GraphView(APIView):
             vertexes.append(vertex)
 
         for v in vertexes:
-            v.calc_vertex_size(min_depends, max_depends)
+            v.calc_vertex_size(min_depends, max_depends, len(vertexes))
 
         return vertexes

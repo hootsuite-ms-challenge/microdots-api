@@ -115,4 +115,4 @@ REDIS_URL = os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379')
 PERSISTENT_BACKEND = RedisBackend()
 ENDPOINT_ENTRY_TIMEOUT = 120
 
-NODE_SIZE = (5, 50)
+NODE_SIZE = (5, 400)

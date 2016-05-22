@@ -56,8 +56,9 @@ class Vertex(BaseGraph):
         ]
         return self.dependents
 
-    def calc_vertex_size(self, minimum, maximum):
+    def calc_vertex_size(self, minimum, maximum, nodes_number):
         min_settings, max_settings = settings.NODE_SIZE
+        max_settings = min(max_settings, nodes_number)
         factor = (max_settings - min_settings) * (len(self.dependents) - minimum)
         self.vertex_size = (factor / max(1, (maximum - minimum))) + min_settings
         return self.vertex_size
