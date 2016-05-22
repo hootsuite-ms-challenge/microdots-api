@@ -52,6 +52,22 @@ class VertexTestCase(GraphTestCase):
         with self.assertRaises(TypeError):
             Vertex()
 
+    def test_get_number_of_dependents(self):
+        origin_one = Vertex('foo')
+        origin_one.save()
+        origin_two = Vertex('bar')
+        origin_two.save()
+        target = Vertex('foobar')
+        target.save()
+        Edge(origin_one, target, 'GET /test/').save()
+        Edge(origin_two, target, 'GET /test/2').save()
+        self.assertEqual(2, target.dependents_number)
+
+    def test_get_number_of_zero_dependents(self):
+        target = Vertex('foobar')
+        target.save()
+        self.assertEqual(0, target.dependents_number)
+
 
 class BaseEdgeTestCase(GraphTestCase):
     def setUp(self):

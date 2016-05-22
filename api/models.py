@@ -39,6 +39,14 @@ class Vertex(BaseGraph):
 
         return node
 
+    @property
+    def dependents_number(self):
+        subgraph = [v for v in self.graph.match(
+            rel_type=Edge.TYPE,
+            end_node=self.node)
+        ]
+        return len(subgraph)
+
     def save(self):
         self.node['endpoints'] = list(self.endpoints)
         if self.graph.exists(self.node):
