@@ -7,10 +7,14 @@ from .models import Edge, Vertex
 
 class GraphTestCase(TestCase):
     def setUp(self):
+        super().setUp()
         self.graph = settings.GRAPH
+        self.backend = settings.PERSISTENT_BACKEND
 
     def tearDown(self):
+        super().tearDown()
         self.graph.delete_all()
+        self.backend.flush_db()
 
 
 class VertexTestCase(GraphTestCase):
@@ -55,10 +59,6 @@ class BaseEdgeTestCase(GraphTestCase):
         self.origin.save()
         self.target = Vertex('target', '/usr/test2')
         self.target.save()
-        self.backend = settings.PERSISTENT_BACKEND
-
-    def tearDown(self):
-        self.backend.flush_db()
 
 
 class EdgeTestCase(BaseEdgeTestCase):
@@ -68,7 +68,9 @@ class EdgeTestCase(BaseEdgeTestCase):
 
     def test_create_edge_twice(self):
         edge = Edge(self.origin, self.target, 'GET /test/')
+        edge.save()
         edge2 = Edge(self.origin, self.target, 'GET /test/')
+        edge2.save()
         self.assertEqual(edge.name, edge2.name)
 
     def test_format_endpoint(self):
@@ -93,18 +95,20 @@ class EdgeTestCase(BaseEdgeTestCase):
 
     def test_request_count(self):
         endpoint = 'GET /test/3'
-        Edge(self.origin, self.target, endpoint)
-        Edge(self.origin, self.target, endpoint)
+        Edge(self.origin, self.target, endpoint).save()
+        Edge(self.origin, self.target, endpoint).save()
         edge = Edge(self.origin, self.target, endpoint)
+        edge.save()
         endpoints = edge.load_endpoints()
         self.assertEqual(endpoints['GET /test/{id}'], 3)
 
     def test_request_count_with_multiple_endpoints(self):
-        Edge(self.origin, self.target, 'GET /test/3/')
-        Edge(self.origin, self.target, 'GET /test/3/')
-        Edge(self.origin, self.target, 'GET /test/')
-        Edge(self.origin, self.target, 'GET /test/')
+        Edge(self.origin, self.target, 'GET /test/3/').save()
+        Edge(self.origin, self.target, 'GET /test/').save()
+        Edge(self.origin, self.target, 'GET /test/3/').save()
+        Edge(self.origin, self.target, 'GET /test/').save()
         edge = Edge(self.origin, self.target, 'GET /test/3/')
+        edge.save()
         endpoints = edge.load_endpoints()
         self.assertEqual(endpoints['GET /test/{id}/'], 3)
         self.assertEqual(endpoints['GET /test/'], 2)
@@ -130,11 +134,13 @@ class RedisBackendTestCase(BaseEdgeTestCase):
     def test_load_endpoints(self):
         test_endpoint = 'GET /test/'
         self.edge = Edge(self.origin, self.target, test_endpoint)
+        self.edge.save()
         endpoints = self.edge.load_endpoints()
         self.assertIn(test_endpoint, endpoints)
 
     def test_load_multiple_endpoints(self):
-        Edge(self.origin, self.target, 'GET /test/')
+        Edge(self.origin, self.target, 'GET /test/').save()
         self.edge = Edge(self.origin, self.target, 'GET /test/2')
+        self.edge.save()
         endpoints = self.edge.load_endpoints()
         self.assertEqual(len(endpoints), 2)
