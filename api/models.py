@@ -10,6 +10,10 @@ class BaseGraph(object):
     backend = settings.PERSISTENT_BACKEND
     graph = settings.GRAPH
 
+    def format_endpoint(self, endpoint):
+        endpoint = re.sub(r'/\d', '/{id}', endpoint)
+        return re.sub(r'\?.*', '', endpoint)
+
 
 class Vertex(BaseGraph):
     LABEL = 'Microdot'
@@ -20,7 +24,7 @@ class Vertex(BaseGraph):
         self.name = name
         self.node = self.instantiate_node(name)
         if endpoint:
-            self.endpoints.add(endpoint)
+            self.endpoints.add(self.format_endpoint(endpoint))
 
     def instantiate_node(self, name):
         node = self.graph.find_one(self.LABEL, property_key='name', property_value=name)
@@ -67,10 +71,6 @@ class Edge(BaseGraph):
     @property
     def name(self):
         return self.relationship.__name__
-
-    def format_endpoint(self, endpoint):
-        endpoint = re.sub(r'/\d', '/{id}', endpoint)
-        return re.sub(r'\?.*', '', endpoint)
 
     @property
     def node_from(self):
