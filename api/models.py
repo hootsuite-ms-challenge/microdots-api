@@ -11,7 +11,7 @@ class BaseGraph(object):
     graph = settings.GRAPH
 
     def format_endpoint(self, endpoint):
-        endpoint = re.sub(r'/\d', '/{id}', endpoint)
+        endpoint = re.sub(r'/\d+', '/{id}', endpoint)
         return re.sub(r'\?.*', '', endpoint)
 
 
