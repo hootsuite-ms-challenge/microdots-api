@@ -17,11 +17,10 @@ class EdgeSerializer(serializers.Serializer):
 class VertexSerializer(serializers.Serializer):
     name = serializers.CharField()
     endpoints = serializers.ListField(child=serializers.CharField())
-    uuid = serializers.CharField()
 
     def to_representation(self, obj):
         return {
-            'id': obj.uuid,
+            'id': obj.name,
             'label': obj.name,
             'endpoints': obj.endpoints,
         }

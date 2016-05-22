@@ -15,16 +15,16 @@ class GraphTestCase(TestCase):
 
 class VertexTestCase(GraphTestCase):
     def test_create_vertex(self):
-        vertex = Vertex('nome', '/usr/test')
+        vertex = Vertex('name', '/usr/test')
         self.assertIsInstance(vertex, Vertex)
 
     def test_save_vertex(self):
-        vertex = Vertex('nome', '/usr/test')
+        vertex = Vertex('name', '/usr/test')
         vertex.save()
         self.assertTrue(self.graph.exists(vertex.node))
 
     def test_vertex_got_endpoint(self):
-        vertex = Vertex('nome', '/usr/test')
+        vertex = Vertex('name', '/usr/test')
         vertex.save()
         self.assertEqual(
             vertex.node['endpoints'][0],
@@ -32,19 +32,19 @@ class VertexTestCase(GraphTestCase):
         )
 
     def test_multiple_endpoints(self):
-        vertex = Vertex('nome', '/usr/test')
+        vertex = Vertex('name', '/usr/test')
         vertex.save()
-        vertex = Vertex('nome', '/usr/test2')
+        vertex = Vertex('name', '/usr/test2')
         vertex.save()
         self.assertEqual(len(vertex.node['endpoints']), 2)
 
     def test_vertex_without_endpoint(self):
-        vertex = Vertex('nome')
+        vertex = Vertex('name')
         vertex.save()
         self.assertTrue(self.graph.exists(vertex.node))
 
     def test_vertex_without_name(self):
-        with self.assertRaises(AttributeError):
+        with self.assertRaises(TypeError):
             Vertex()
 
 

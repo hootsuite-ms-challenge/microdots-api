@@ -18,9 +18,8 @@ class BaseGraph(object):
 class Vertex(BaseGraph):
     LABEL = 'Microdot'
 
-    def __init__(self, name=None, endpoint=None):
+    def __init__(self, name, endpoint=None):
         self.endpoints = None
-        self.uuid = None
         self.name = name
         self.node = self.instantiate_node(name)
         if endpoint:
@@ -30,7 +29,7 @@ class Vertex(BaseGraph):
         node = self.graph.find_one(self.LABEL, property_key='name', property_value=name)
         if not node:
             node = Node(self.LABEL, name=name)
-        self.uuid = node.__name__
+        self.name = node['name']
 
         self.endpoints = node['endpoints']
         if self.endpoints:
@@ -51,17 +50,18 @@ class Vertex(BaseGraph):
 class Edge(BaseGraph):
     TYPE = 'Depends'
 
-    def __init__(self, origin, target, endpoint):
+    def __init__(self, origin, target, endpoint=None):
         self.origin = origin
         self.target = target
-        self.relationship = self.instantiate_relationship(origin, target)
-        self.save_endpoint(endpoint)
+        self.relationship = self.instantiate_relationship(origin.node, target.node)
+        if endpoint:
+            self.endpoint = endpoint
 
-    def instantiate_relationship(self, origin, target):
-        relationship = self.graph.match(start_node=origin, rel_type=self.TYPE, end_node=target.node)
-        if not relationship:
-            relationship = Relationship(origin.node, self.TYPE, target.node)
-        self.uuid = relationship.__name__
+    def instantiate_relationship(self, origin_node, target_node):
+        relationship = self.graph.match_one(start_node=origin_node, rel_type=self.TYPE, end_node=target_node)
+        if relationship is None:
+            name = origin_node['name'] + '-' +  target_node['name']
+            relationship = Relationship(origin_node, self.TYPE, target_node, name=name)
         return relationship
 
     def load_endpoints(self):
@@ -74,15 +74,21 @@ class Edge(BaseGraph):
 
     @property
     def node_from(self):
-        return self.origin.node.__name__
+        return self.origin.name
 
     @property
     def node_to(self):
-        return self.target.node.__name__
+        return self.target.name
 
     def save_endpoint(self, endpoint):
         endpoint = self.format_endpoint(endpoint)
         self.backend.save_endpoint(self.name, endpoint)
 
     def save(self):
-        self.graph.create(self.relationship)
+        if self.graph.exists(self.relationship):
+            self.graph.push(self.relationship)
+        else:
+            self.graph.create(self.relationship)
+
+        if self.endpoint:
+            self.save_endpoint(self.endpoint)
