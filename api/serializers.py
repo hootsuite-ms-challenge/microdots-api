@@ -25,7 +25,7 @@ class EdgeSerializer(serializers.Serializer):
 
     def get_endpoints(self, obj):
         endpoints = obj.load_endpoints()
-        return [{'endpoint': e, 'acessos': endpoints[e]} for e in endpoints]
+        return [{'endpoint': e, 'access': endpoints[e]} for e in endpoints]
 
 
 class VertexSerializer(serializers.Serializer):
