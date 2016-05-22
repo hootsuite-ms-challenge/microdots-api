@@ -11,7 +11,7 @@ class EdgeSerializer(serializers.Serializer):
         return {
             'from': obj.node_from,
             'to': obj.node_to,
-            'label': self.get_endpoint_usage(obj),
+            'usage': self.get_endpoint_usage(obj),
             'id': obj.name,
             'endpoints': self.get_endpoints(obj),
         }
